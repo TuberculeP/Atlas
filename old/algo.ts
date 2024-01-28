@@ -1,26 +1,21 @@
-export interface GComponent {
-  name: string;
-  from_recipe: GRecipe[];
-  for_recipe: GRecipe[];
-  basic?: boolean;
-}
+/**
+ * @fileoverview
+ * This file contains important types and data structures for the No Man's Sky
+ * Graphical Resource Analysis project. It also contains some utility functions
+ * that are used throughout the project.
+ * 
+ * @author TuberculeP (Typescript implementation)
+ * @author RaphA (Graph theory & Algorithms)
+ * 
+ * @version 0.1.0
+ * 
+ * @copyright (c) TuberculeP RaphA
+ * @license MIT
+ */
 
-export interface GComponentForRecipe {
-  component: GComponent;
-  amount: number;
-}
+import type { GComponent, GRecipe } from "./types";
 
-export interface GRecipe {
-  time?: number;
-  //...
-  components: GComponentForRecipe[];
-  output: GComponent;
-  amount: number;
-}
-
-const hmap: Record<string, GComponent> = {};
-
-export const createHmap = () => ({ hmap });
+export const hmap: Record<string, GComponent> = {};
 
 export const logger = {
   enabled: false,
