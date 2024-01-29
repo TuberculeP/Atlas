@@ -6,7 +6,7 @@ const { item } = defineProps<{ item: GameItemModel }>();
 <template>
   <div class="item">
     <h4>{{ item.Name }}</h4>
-    <ItemImage :item="item" />
+    <ItemImage :id="item.Id" />
   </div>
 </template>
 

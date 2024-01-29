@@ -24,7 +24,7 @@ const { parseDescription } = useDescriptionParser();
     <div class="inspect">
       <template v-if="item">
         <h1>{{ item.value.Name }}</h1>
-        <ItemImage :item="item.value" />
+        <ItemImage :id="item.value.Id" />
         <pre>{{ item.value.Id }}</pre>
         <p v-html="parseDescription(item.value.Description)" />
         <NuxtLink :to="'/output/' + item.value.Id"

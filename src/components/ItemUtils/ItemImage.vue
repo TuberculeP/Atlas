@@ -1,16 +1,29 @@
 <script setup lang="ts">
-import type { GameItemModel } from "assistantapps-nomanssky-info";
-const { item } = defineProps<{ item: GameItemModel }>();
+import { useGraphStore } from "~/store/graphStore";
+const props = defineProps<{ id: string }>();
+
+const { graph } = useGraphStore();
+
+const item = ref(graph.get(props.id));
+
+watch(
+  () => props.id,
+  (newId) => {
+    item.value = graph.get(newId);
+  }
+);
 </script>
 
 <template>
-  <div class="image" :style="`background-color: #${item.Colour};`">
-    <span class="abbrev" v-if="item.Abbrev">{{ item.Abbrev }}</span>
-    <img
-      :src="'https://app.nmsassistant.com/assets/images/' + item.Icon"
-      alt=""
-    />
-  </div>
+  <ClientOnly>
+    <div v-if="item" class="image" :style="`background-color: #${item.value.Colour};`">
+      <span class="abbrev" v-if="item.value.Abbrev">{{ item.value.Abbrev }}</span>
+      <img
+        :src="'https://app.nmsassistant.com/assets/images/' + item.value.Icon"
+        alt=""
+      />
+    </div>
+  </ClientOnly>
 </template>
 
 <style scoped lang="scss">
