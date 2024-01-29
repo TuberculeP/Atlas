@@ -1,43 +1,38 @@
 <script setup lang="ts">
-import type {
-  GameItemModel,
-  ProcessorItemDetails,
-} from "assistantapps-nomanssky-info";
 import ItemImage from "./ItemUtils/ItemImage.vue";
 import useDescriptionParser from "../composables/useDescriptionParser";
+import { useGraphStore } from "~/store/graphStore";
 
-const props = defineProps<{ item: GameItemModel | null }>();
+const props = defineProps<{ id: string | null }>();
 
-const { parseDescription } = useDescriptionParser();
+const { graph } = useGraphStore();
 
-const recipes: Ref<ProcessorItemDetails[] | null> = (
-  await useFetch<ProcessorItemDetails[]>(
-    "/api/recipes?output=" + props.item?.Id
-  )
-).data;
+const item = ref(graph.get(props.id ?? ""));
 
 watch(
-  () => props.item,
-  async () => {
-    recipes.value = (
-      await useFetch<ProcessorItemDetails[]>(
-        "/api/recipes?output=" + props.item?.Id
-      )
-    ).data.value;
+  () => props.id,
+  (newId) => {
+    item.value = graph.get(newId ?? "");
   }
 );
+
+const { parseDescription } = useDescriptionParser();
 </script>
 
 <template>
-  <div class="inspect">
-    <template v-if="props.item">
-      <h1>{{ props.item.Name }}</h1>
-      <ItemImage :item="props.item" />
-      <pre>{{ props.item.Id }}</pre>
-      <p v-html="parseDescription(props.item.Description)" />
-      <p v-if="recipes?.length">Involved in {{ recipes.length }} refinery processes</p>
-    </template>
-  </div>
+  <ClientOnly>
+    <div class="inspect">
+      <template v-if="item">
+        <h1>{{ item.value.Name }}</h1>
+        <ItemImage :item="item.value" />
+        <pre>{{ item.value.Id }}</pre>
+        <p v-html="parseDescription(item.value.Description)" />
+        <NuxtLink :to="'/output/' + item.value.Id"
+          >See potential crafts</NuxtLink
+        >
+      </template>
+    </div>
+  </ClientOnly>
 </template>
 
 <style scoped lang="scss">

@@ -15,7 +15,9 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
     "assistantapps-nomanssky-info": "^4.47.4886",
+    "pinia": "^2.1.7",
     "sass": "^1.70.0",
     "typescript": "^5.3.3"
   }
