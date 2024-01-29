@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "assistantapps-nomanssky-info": "^4.47.4886",
-    "sass": "^1.70.0"
+    "sass": "^1.70.0",
+    "typescript": "^5.3.3"
   }
 }
