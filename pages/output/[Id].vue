@@ -44,11 +44,16 @@ const filteredWays = computed(() =>
               v-for="([comp, qt], inputIdx) in step.inputs"
               :key="'input' + inputIdx + 'step' + stepIdx + 'way' + wayIdx"
             >
-              <div class="image"><ItemImage :id="comp.value.Id" /></div>
-              <p>{{ qt }}</p>
+              <div class="image">
+                <ItemImage :id="comp.value.Id" />
+                <p>{{ qt }}</p>
+              </div>
             </template>
             <div class="output-image">
-              <ItemImage :id="step.output.value.Id" />
+              <div class="image">
+                <ItemImage :id="step.output[0].value.Id" />
+              </div>
+              <p>{{ step.output[1] }}</p>
             </div>
           </div>
         </div>
@@ -81,12 +86,16 @@ const filteredWays = computed(() =>
     gap: 20px;
     .image {
       width: 100px;
+      text-align: center;
     }
     .output-image {
       width: 100px;
-      border-radius: 100%;
-      overflow: clip;
-      box-shadow: 0 0 10px goldenrod;
+      text-align: center;
+      .image {
+        box-shadow: 0 0 10px goldenrod;
+        border-radius: 100%;
+        overflow: clip;
+      }
     }
   }
 }

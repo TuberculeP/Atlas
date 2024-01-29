@@ -13,6 +13,6 @@ export type GRecipeComponent = [GComponent, number]
 
 export interface GRecipe {
   value: ProcessorItemDetails;
-  output: GComponent;
+  output: GRecipeComponent;
   inputs: GRecipeComponent[];
 }

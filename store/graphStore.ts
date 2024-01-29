@@ -47,10 +47,12 @@ export const useGraphStore = defineStore("graphStore", () => {
   });
 
   allRecipes.value?.forEach((recipe: ProcessorItemDetails) => {
-    const output = graph.get(recipe.Output.Id);
-    if (!output) return;
+    const outputComponent = graph.get(recipe.Output.Id);
+    if (!outputComponent) return;
+    const output: GRecipeComponent = [outputComponent, recipe.Output.Quantity];
+    if (!output || !output[0]) return;
     // ajouter la recette à from_recipe de l'output, en vérifiant d'abord que la recette n'est pas déjà présente
-    if (output.from_recipe.some((r) => r.value.Id === recipe.Id)) return;
+    if (output[0].from_recipe.some((r) => r.value.Id === recipe.Id)) return;
     if (recipe.Inputs.some(({ Id }) => !graph.has(Id))) return;
     const recipeForGraph: GRecipe = {
       value: recipe,
@@ -60,7 +62,7 @@ export const useGraphStore = defineStore("graphStore", () => {
         Quantity,
       ]) as GRecipeComponent[],
     };
-    output.from_recipe.push(recipeForGraph);
+    output[0].from_recipe.push(recipeForGraph);
     recipeForGraph.inputs.forEach(([component]) => {
       component.for_recipe.push(recipeForGraph);
     });
