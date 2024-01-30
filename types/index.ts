@@ -9,10 +9,15 @@ export interface GComponent {
   for_recipe: GRecipe[];
 }
 
-export type GRecipeComponent = [GComponent, number]
+export type GRecipeComponent = [GComponent, number];
 
 export interface GRecipe {
   value: ProcessorItemDetails;
   output: GRecipeComponent;
   inputs: GRecipeComponent[];
+}
+
+export interface WayWithDetails {
+  steps: GRecipe[];
+  requirements: [GComponent, number][];
 }

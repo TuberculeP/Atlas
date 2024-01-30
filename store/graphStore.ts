@@ -3,7 +3,12 @@ import type {
   ProcessorItemDetails,
 } from "assistantapps-nomanssky-info";
 import { defineStore } from "pinia";
-import type { GComponent, GRecipeComponent, GRecipe } from "~/types";
+import type {
+  GComponent,
+  GRecipeComponent,
+  GRecipe,
+  WayWithDetails,
+} from "~/types";
 // le graphe est simplement un dictionnaire clé string valeur gcomponent
 class Graph extends Map<string, GComponent> {
   constructor() {
@@ -26,6 +31,50 @@ class Graph extends Map<string, GComponent> {
 
       return [...pw, ...tw];
     }, []);
+  }
+  private findRequirementsFromWay(way: GRecipe[]): [GComponent, number][] {
+    const requirements: [GComponent, number][] = [];
+    [...way].reverse().forEach(({ inputs, output }) => {
+      const [outputComponent, quantity] = output;
+      const outputComponentIdx = requirements.findIndex(
+        ([c]) => c === outputComponent
+      );
+      let outputQuantity = 0;
+      if (outputComponentIdx === -1) {
+        requirements.push([outputComponent, quantity]);
+        outputQuantity = quantity;
+      } else {
+        outputQuantity = requirements[outputComponentIdx][1];
+        requirements[outputComponentIdx][1] = 0;
+      }
+      const ratio = Math.ceil(outputQuantity / quantity);
+
+      inputs.forEach(([inputComponent, inputQuantity]) => {
+        const inputComponentIdx = requirements.findIndex(
+          ([c]) => c === inputComponent
+        );
+        // ajouter input * quantity à requirements
+        if (inputComponentIdx !== -1) {
+          requirements[inputComponentIdx][1] += inputQuantity * ratio;
+        } else {
+          requirements.push([inputComponent, inputQuantity * ratio]);
+        }
+      });
+    });
+    // retirer 1 x output de requirements
+    const finalOutput = way[way.length - 1].output;
+    const finalOutputIdx = requirements.findIndex(
+      ([c]) => c === finalOutput[0]
+    );
+    requirements[finalOutputIdx][1] -= finalOutput[1];
+    return requirements.filter(([, quantity]) => quantity !== 0);
+  }
+  public findWays(component: GComponent): WayWithDetails[] {
+    const ways = this.findWaysRaw(component);
+    return ways.map((way) => ({
+      steps: way,
+      requirements: this.findRequirementsFromWay(way),
+    }));
   }
 }
 
