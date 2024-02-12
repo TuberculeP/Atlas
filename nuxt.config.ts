@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: {
-    enabled: false,
+    enabled: true,
   },
   vite: {
     server: {

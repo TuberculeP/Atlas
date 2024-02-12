@@ -21,3 +21,8 @@ export interface WayWithDetails {
   steps: GRecipe[];
   requirements: [GComponent, number][];
 }
+
+export interface Comp {
+  name: string;
+  children: Comp[];
+}
