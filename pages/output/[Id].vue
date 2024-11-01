@@ -10,6 +10,7 @@ const waysMaxDepth = ref(5);
 
 const itemId = route.params.Id as string;
 const item = graph.get(itemId);
+item && (document.title = "Recipes for: " + item?.value.Name);
 const allCraftingWays: WayWithDetails[] | undefined =
   item && graph.findWays(item);
 

@@ -1,80 +1,89 @@
 <script setup lang="ts">
-import type { GameItemModel } from "assistantapps-nomanssky-info";
-import Item from "../src/components/Item.vue";
-import ItemInspect from "../src/components/ItemInspect.vue";
+import RecursiveItem from "~/src/components/RecursiveItem.vue";
 import { useGraphStore } from "~/store/graphStore";
+import type { GComponent, RecursiveTree } from "~/types";
 
 const { graph } = useGraphStore();
 
-const search = ref("");
-const filteredItems = computed(() =>
-  Array.from(graph, ([Id, comp]) => comp.value).filter((item) => {
-    const searchLower = search.value.toLowerCase();
-    return (
-      item.Name.toLowerCase().includes(searchLower) ||
-      item.Abbrev?.toLowerCase().includes(searchLower)
-    );
-  })
-);
+const currentTree = reactive<RecursiveTree>({});
 
-const currentItemId = ref<string | null>(
-  filteredItems.value ? filteredItems.value[0]?.Id : null
-);
+const itemsFromTree = computed(() => {
+  const items: {
+    in_inventory: { item: GComponent; quantity: number }[];
+    to_find: { item: GComponent; quantity: number }[];
+  } = { in_inventory: [], to_find: [] };
+
+  // recursive function to go through the tree
+  function recursiveTreeToItemsHelper(tree: RecursiveTree) {
+    // if the tree has a value, add it to the correct list
+    if (tree.item?.value) {
+      if (tree.in_inventory) {
+        if (
+          items.in_inventory.some(
+            (i) => i.item.value.Id === tree.item?.value?.Id
+          )
+        ) {
+          items.in_inventory.find(
+            (i) => i.item.value.Id === tree.item?.value?.Id
+          )!.quantity += tree.quantity || 0;
+        } else {
+          items.in_inventory.push({
+            item: tree.item,
+            quantity: tree.quantity || 0,
+          });
+        }
+      } else {
+        if (
+          items.to_find.some((i) => i.item.value.Id === tree.item?.value?.Id)
+        ) {
+          items.to_find.find(
+            (i) => i.item.value.Id === tree.item?.value?.Id
+          )!.quantity += tree.quantity || 0;
+        } else {
+          items.to_find.push({
+            item: tree.item,
+            quantity: tree.quantity || 0,
+          });
+        }
+      }
+    }
+
+    // if the tree has subs, go through them
+    if (tree.subs) {
+      for (const sub of tree.subs) {
+        recursiveTreeToItemsHelper(sub);
+      }
+    }
+  }
+  recursiveTreeToItemsHelper(currentTree);
+  return items;
+});
 </script>
 
 <template>
   <ClientOnly>
-    <main v-if="graph">
-      <div class="select-item">
-        <input
-          v-model="search"
-          :placeholder="'Search in ' + filteredItems?.length + ' products'"
-        />
-
-        <div class="item-wrapper">
-          <Item
-            v-for="item in filteredItems"
-            :key="item.Id"
-            :item="item"
-            @click="currentItemId = item.Id"
-          />
+    <div>
+      <div class="total-items">
+        <h1>In Inventory</h1>
+        <div
+          v-for="({ item, quantity }, i) in itemsFromTree.in_inventory"
+          class="item"
+        >
+          <p>{{ item.value.Name }} x {{ quantity }}</p>
         </div>
       </div>
-      <ItemInspect :id="currentItemId" />
-    </main>
+      <div class="total-items">
+        <h1>To Find</h1>
+        <div
+          v-for="({ item, quantity }, i) in itemsFromTree.to_find"
+          class="item"
+        >
+          <p>{{ item.value.Name }} x {{ quantity }}</p>
+        </div>
+      </div>
+      <RecursiveItem :graph="graph" :current-tree="currentTree" />
+    </div>
   </ClientOnly>
 </template>
 
-<style scoped lang="scss">
-main {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  .select-item {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100vh;
-
-    input {
-      padding: 5px 10px;
-      background-color: rgb(228, 228, 228);
-      border-radius: 20px;
-      border: none;
-      width: fit-content;
-      margin: 20px auto;
-      text-align: center;
-    }
-
-    .item-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
-      flex-wrap: wrap;
-      padding: 20px 30px;
-      overflow: scroll;
-      height: 100%;
-    }
-  }
-}
-</style>
+<style lang="scss"></style>

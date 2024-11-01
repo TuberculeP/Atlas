@@ -21,3 +21,10 @@ export interface WayWithDetails {
   steps: GRecipe[];
   requirements: [GComponent, number][];
 }
+
+export type RecursiveTree = {
+  item?: GComponent;
+  quantity?: number;
+  in_inventory?: boolean;
+  subs?: RecursiveTree[];
+};
