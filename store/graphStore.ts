@@ -127,8 +127,13 @@ export const useGraphStore = defineStore("graphStore", () => {
     );
   }
 
+  const test = {
+    paraffinium: graph.get("raw24"),
+  };
+
   return {
     graph,
     getWaysDetail,
+    test,
   };
 });

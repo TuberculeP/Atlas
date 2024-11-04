@@ -23,8 +23,10 @@ export interface WayWithDetails {
 }
 
 export type RecursiveTree = {
-  item?: GComponent;
-  quantity?: number;
+  node_id: string;
+  item: GComponent;
+  quantity: number;
   in_inventory?: boolean;
+  to_find?: boolean;
   subs?: RecursiveTree[];
 };
