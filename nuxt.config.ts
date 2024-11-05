@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "shadcn-nuxt",
     "@nuxtjs/tailwindcss",
+    "@vite-pwa/nuxt",
   ],
 
   compatibilityDate: "2024-11-01",
@@ -35,5 +36,21 @@ export default defineNuxtConfig({
      * @default "./components/ui"
      */
     componentDir: "./components/ui",
+  },
+  pwa: {
+    manifest: {
+      name: "pwa nuxt 3",
+      short_name: "pwa nuxt",
+      theme_color: "#8a8a5e",
+      description: "Arman Abi r.man.abi@gmail.com",
+      icons: [],
+    },
+    workbox: {
+      navigateFallback: "/",
+    },
+    devOptions: {
+      enabled: true,
+      type: "module",
+    },
   },
 });
