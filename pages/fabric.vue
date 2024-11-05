@@ -6,8 +6,7 @@ import { MiniMap } from "@vue-flow/minimap";
 import type { GComponent, RecursiveTree } from "~/types";
 import { useGraphStore } from "~/store/graphStore";
 import _ from "lodash";
-
-const { onConnect, addEdges, onPaneReady, fitView, snapToGrid } = useVueFlow();
+const { onConnect, addEdges, snapToGrid } = useVueFlow();
 
 // Atlas
 const { graph, test } = useGraphStore();
@@ -36,18 +35,21 @@ watch(
   { deep: true }
 );
 
-const nodes = ref<Node[]>([
-  {
+const nodes = ref<Node[]>([]);
+onMounted(() => {
+  nodes.value.push({
     id: "1",
     type: "test",
     label: "Node 1",
-    position: { x: 100, y: -100 },
+    position: {
+      x: window.innerWidth / 2 - 150,
+      y: 50,
+    },
     data: currentTree,
-  },
-]);
+  });
+});
 
 const edges = ref<Edge[]>([]);
-
 function areNodesEqual(node1: RecursiveTree, node2: RecursiveTree) {
   const testableNode1 = {
     item: node1.item?.value.Id,
@@ -59,7 +61,6 @@ function areNodesEqual(node1: RecursiveTree, node2: RecursiveTree) {
   };
   return _.isEqual(testableNode1, testableNode2);
 }
-
 function recursivelyCleanNodes(tree: RecursiveTree) {
   console.log("node to clean : ", tree.item?.value.Name, _.cloneDeep(tree));
   // clear children nodes
@@ -119,35 +120,23 @@ const nodeCounter = computed(() => nodes.value.length);
 onConnect((params) => {
   addEdges([params]);
 });
-onPaneReady((instance) => instance.fitView());
-const onEnableSubnodes = (value: { parent: string; data: any }) => {
-  console.log("Enable subnodes", value);
-  const parent =
-    nodes.value.find((node) => node.id === value.parent) || nodes.value[0];
-  const newSubnode = {
-    id: `subnode-${nodeCounter.value + 1}`,
-    type: "test",
-    label: "Subnode",
-    position: { x: parent.position.x + 200, y: parent.position.y + 200 },
-  };
-  nodes.value.push(newSubnode);
-  edges.value.push({
-    id: `e${value.parent}-${newSubnode.id}`,
-    source: value.parent,
-    target: newSubnode.id,
-  });
-};
 </script>
 
 <template>
   <ClientOnly>
+    <Card class="w-fit fixed bg-white z-10 m-2">
+      <CardHeader>
+        <CardTitle>Craft : {{ currentTree.item?.value.Name }}</CardTitle>
+        <CardDescription>Detailed ingredient needs</CardDescription>
+      </CardHeader>
+      <CardContent> Contenu </CardContent>
+    </Card>
     <div class="flow-container">
       <VueFlow
         v-model:nodes="nodes"
         v-model:edges="edges"
-        fit-view-on-init
         class="vue-flow-basic-example"
-        :default-zoom="2"
+        :default-zoom="10"
         :min-zoom="0.2"
         :max-zoom="4"
       >

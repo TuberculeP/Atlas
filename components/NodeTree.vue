@@ -57,6 +57,8 @@ watch(
 watch(
   choice,
   (newChoice) => {
+    delete currentTree.subs;
+    currentRecipeId.value = null;
     switch (newChoice) {
       case 1:
         currentTree.in_inventory = true;
@@ -67,7 +69,6 @@ watch(
         currentTree.to_find = true;
         break;
       case 3:
-        delete currentTree.subs;
         currentTree.in_inventory = false;
         currentTree.to_find = false;
     }
